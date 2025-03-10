@@ -92,51 +92,60 @@ return c.json({
     })
 })
 
-blogsRouter.get('/:bulk', async (c) => {
-    const prisma= new PrismaClient({
-        datasourceUrl:c.env.DATABASE_URL
-       }).$extends(withAccelerate())
-       const userId = c.get('userId');
-       const body = await c.req.json();
-       try{
-        const blogs = await prisma.post.findMany({
-            where:{
-                id:body.id
+blogsRouter.get('/bulk', async (c) => {
+    const prisma = new PrismaClient({
+        datasourceUrl: c.env.DATABASE_URL,
+    }).$extends(withAccelerate())
+    const blogs = await prisma.post.findMany({
+        select: {
+            content: true,
+            title: true,
+            id: true,
+            author: {
+                select: {
+                    name: true
+                }
             }
-        })
-    
-        return c.json({blogs})
+        }
+    });
 
-       }catch(e){
-        return c.json({
-            msg:"Error while fetching the data"
-        })
-       }
-    
-  })
+    return c.json({
+        blogs
+    })
+})
   
-  blogsRouter.get('/:id', async (c) => {
-    const prisma= new PrismaClient({
-        datasourceUrl:c.env.DATABASE_URL
-       }).$extends(withAccelerate())
-       const userId = c.get('userId');
-       const id = await c.req.param("id");
-       try{
-        const blog = await prisma.post.findFirst({
-            where:{
-                id:id
-            }
-        })
-    
-        return c.json({blog})
+blogsRouter.get('/:id', async (c) => {
+    const id = c.req.param("id");
+    const prisma = new PrismaClient({
+      datasourceUrl: c.env.DATABASE_URL,
+    }).$extends(withAccelerate())
 
-       }catch(e){
-        return c.json({
-            msg:"Error while fetching the data"
+    try {
+        const blog = await prisma.post.findFirst({
+            where: {
+                id: id
+            },
+            select: {
+                id: true,
+                title: true,
+                content: true,
+                author: {
+                    select: {
+                        name: true
+                    }
+                }
+            } 
         })
-       }
     
-   
-  })
+        return c.json({
+            blog
+        });
+    } catch(e) {
+        c.status(411); // 4
+        return c.json({
+            message: "Error while fetching blog post"
+        });
+    }
+})
 
   
