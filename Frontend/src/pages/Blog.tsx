@@ -7,7 +7,7 @@ export const Blog= ()=>{
     const {blog,loading} = useBlog({
         id:  id 
     });
-    if(loading){
+    if(loading || !blog){
         return <div>
             Loading..
         </div>
