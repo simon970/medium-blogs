@@ -53,9 +53,10 @@ userRouter.post('/signup', async(c) => {
     const body = await c.req.json();
   
     const user = await prisma.user.findUnique({
-      where:{email:body.email}})
+      where:{email:body.email,password:body.password}})
   
       if(!user){
+        c.status(411)
         return c.json({
           msg:"User Not Found"
         })

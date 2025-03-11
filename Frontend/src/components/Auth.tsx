@@ -17,11 +17,20 @@ export const Auth = ({ type }: { type: "signup" | "signin" }) => {
             const response =  await axios.post(`${BACKEND_URL}/api/v1/user/${type === "signup"?"signup":"signin"}`,postInputs);
             localStorage.setItem("token",response.data.jwt)
 
-            if(response){
-                console.log(response)
-                navigate("/blogs")
+            if(!postInputs.email && !postInputs.password){
+               alert("Please Sign in ")
             }else{
-                alert("Please Sign in ")
+                if(response){
+                    if(type==="signin"){
+                        navigate("/blogs")
+                    }else{
+                        navigate("/signin")
+                    }
+                 
+                }else{
+                    alert("Invalid Username or Password")
+                }
+                
             }
             
         }catch(e){
@@ -29,8 +38,7 @@ export const Auth = ({ type }: { type: "signup" | "signin" }) => {
         }
      
     }
-    
-    return <div className="h-screen flex justify-center flex-col">
+     return <div className="h-screen flex justify-center flex-col">
         <div className="flex justify-center">
             <div>
                 <div className="px-10">
